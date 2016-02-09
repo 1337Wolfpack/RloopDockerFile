@@ -21,7 +21,7 @@ Instructions :
 
 All this will be done with an UI later on.
 
-FEATURES : 
- - Backup interface (copy data to host)
- - exposed ports link with custom commands
- - team based Dockerfiles
+UI FEATURES : 
+ - easy data management Backup interface (copy data to host)
+ - List of containers / ports available 
+ 

@@ -113,6 +113,11 @@ RUN tar -xzvf gmsh-2.9.2-Linux64.tgz
 RUN rm gmsh-2.9.2-Linux64.tgz
 RUN ln -s ~/gMsh/gmsh-2.9.2-Linux/bin/gmsh /usr/bin/gmsh
 
+WORKDIR /opt
+RUN mkdir xrdpx11
+WORKDIR /opt/xrdpx11
+RUN git clone https://github.com/scarygliders/X11RDP-o-Matic.git .
+RUN X11rdp-o-matic.sh --justdoit
 
 # for RDP and SSH
 EXPOSE 3389

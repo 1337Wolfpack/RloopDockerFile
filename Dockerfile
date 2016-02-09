@@ -42,29 +42,77 @@ RUN sudo apt-get update && sudo apt-get upgrade -y
 RUN sudo apt-get install -y --no-install-recommends ubuntu-mate-core ubuntu-mate-desktop
 
 
+#BACKUP SYSTEM (needs to use some volume mounted at /Backups)
+RUN sudo apt-get install -y rsnapshot
+ADD rsnapshot/rsnapshot.conf /etc/rsnapshot.conf
+ADD rsnapshot/service/rsnapshot /etc/cron.d/rsnapshot
 
-#COPY SCRIPT TO RUN local xrdp server
-ADD run.sh /usr/local/bin/run
 
 #COPY CONFIG FILE
 ADD xrdp.ini /etc/xrdp/
-
 
 #DEPS
 RUN sudo apt-get -y install build-essential python-dev gfortran
 RUN sudo apt-get -y install python-numpy python-scipy python-pandas
 
-#OPENFOAM
-#RUN wget https://sourceforge.net/projects/openfoamplus/files/ThirdParty-v3.0+.tgz /HOME/rloop/
-#RUN wget https://sourceforge.net/projects/openfoamplus/files/OpenFOAM-v3.0+.tgz /HOME/rloop/
-#RUN mkdir /HOME/rloop/OpenFOAM && tar -xzf /HOME/rloop/OpenFOAM-v3.0+.tgz -C /HOME/rloop/OpenFOAM && tar -xzf /HOME/rloop/ThirdParty-v3.0+.tgz -C /HOME/rloop/OpenFOAM
-#RUN source /HOME/rloop/OpenFOAM/OpenFOAM-v3.0+/etc/bashrc
-#RUN cd $WM_THIRD_PARTY_DIR && ./makeParaView4
-#RUN cd $WM_PROJECT_DIR && foam
-#RUN cd $WM_PROJECT_DIR && ./Allwmake
-
 #PODUNSIM
-RUN git clone https://github.com/rLoopTeam/podRunSim.git /opt/podRunSim
+RUN git clone https://github.com/rLoopTeam/podRunSim.git /home/rloop/podRunSim
+
+
+# OpenFOAM
+
+# Downloading source code
+RUN mkdir /opt/OpenFOAM
+WORKDIR /opt/OpenFOAM
+
+RUN wget http://downloads.sourceforge.net/foam/OpenFOAM-3.0.1.tgz?use_mirror=mesh
+RUN mv OpenFOAM-3.0.1.tgz?use_mirror=mesh OpenFOAM-3.0.1.tgz
+RUN tar xzf OpenFOAM-3.0.1.tgz
+RUN rm OpenFOAM-3.0.1.tgz
+
+# Third-Party
+RUN wget http://downloads.sourceforge.net/foam/ThirdParty-3.0.1.tgz?use_mirror=mesh
+RUN mv ThirdParty-3.0.1.tgz?use_mirror=mesh ThirdParty-3.0.1.tgz
+RUN tar xzf ThirdParty-3.0.1.tgz
+RUN rm ThirdParty-3.0.1.tgz 
+
+# Dependencies
+
+RUN apt-get install -y flex bison gnuplot zlib1g-dev libopenmpi-dev openmpi-bin qt4-dev-tools libqt4-dev libqt4-opengl-dev freeglut3-dev libqtwebkit-dev
+RUN apt-get install -y libreadline-dev libglfw2 libglfw-dev freeglut3-dev libglew-dev libcheese7 libcheese-gtk23 libclutter-gst-2.0-0 libcogl15 libclutter-gtk-1.0-0 libclutter-1.0-0 csh libptscotch-5.1
+RUN apt-get install -y libncurses-dev libxt-dev libscotch-dev libcgal-dev binutils-dev
+
+
+RUN sudo add-apt-repository http://www.openfoam.org/download/ubuntu
+RUN apt-get update
+#RUN apt-get install -y openfoam30
+#RUN apt-get install -y paraviewopenfoam44
+RUN apt-get install qt4-dev-tools 
+
+RUN wget http://www.openfoam.org/download/ubuntu/dists/trusty/main/binary-amd64/openfoam30_1-1_amd64.deb
+
+RUN wget http://www.openfoam.org/download/ubuntu/dists/trusty/main/binary-amd64/paraviewopenfoam44_0-1_amd64.deb
+
+RUN dpkg -i openfoam30_1-1_amd64.deb
+
+RUN dpkg -i paraviewopenfoam44_0-1_amd64.deb 
+
+# Setting environment variable
+ENV FOAM_INST_DIR /opt/OpenFOAM
+
+#Custom build script
+#ADD OpenFOAM/install.sh /opt/OpenFOAM/install.sh
+#RUN /opt/OpenFOAM/install.sh
+
+# gmsh installation
+
+RUN mkdir ~/gMsh
+WORKDIR ~/gMsh
+RUN wget http://geuz.org/gmsh/bin/Linux/gmsh-2.9.2-Linux64.tgz
+RUN tar -xzvf gmsh-2.9.2-Linux64.tgz
+RUN rm gmsh-2.9.2-Linux64.tgz
+RUN ln -s ~/gMsh/gmsh-2.9.2-Linux/bin/gmsh /usr/bin/gmsh
+
 
 # for RDP and SSH
 EXPOSE 3389

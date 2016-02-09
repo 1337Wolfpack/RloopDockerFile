@@ -113,6 +113,8 @@ RUN tar -xzvf gmsh-2.9.2-Linux64.tgz
 RUN rm gmsh-2.9.2-Linux64.tgz
 RUN ln -s ~/gMsh/gmsh-2.9.2-Linux/bin/gmsh /usr/bin/gmsh
 
+RUN apt-get install virtualgl
+
 WORKDIR /opt
 RUN mkdir xrdpx11
 WORKDIR /opt/xrdpx11

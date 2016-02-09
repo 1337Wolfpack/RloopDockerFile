@@ -49,10 +49,6 @@ ADD run.sh /usr/local/bin/run
 #COPY CONFIG FILE
 ADD xrdp.ini /etc/xrdp/
 
-#COPY AND START XRDP LISTENING SERVICE
-ADD start.sh /
-
-
 
 #DEPS
 RUN sudo apt-get -y install build-essential python-dev gfortran
@@ -70,10 +66,10 @@ RUN sudo apt-get -y install python-numpy python-scipy python-pandas
 #PODUNSIM
 RUN git clone https://github.com/rLoopTeam/podRunSim.git /opt/podRunSim
 
-
-
-
 # for RDP and SSH
 EXPOSE 3389
 EXPOSE 22
+
+#COPY AND START XRDP LISTENING SERVICE
+ADD start.sh /
 CMD /start.sh
